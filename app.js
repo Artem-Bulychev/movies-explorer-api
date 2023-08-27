@@ -17,7 +17,7 @@ const app = express();
 
 const { URL } = require('./utils/constants');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 4000 } = process.env;
 
 app.use(cors());
 
