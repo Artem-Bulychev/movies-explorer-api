@@ -15,15 +15,13 @@ const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
 
-const { URL } = require('./utils/constants');
-
 const { PORT = 4000 } = process.env;
 
 app.use(cors());
 
 mongoose.set('strictQuery', true);
 
-mongoose.connect(URL)
+mongoose.connect('mongodb://127.0.0.1:27017/bitfilmsdb')
   .then(() => {
     console.log('БД успешно подключена');
   })
