@@ -3,15 +3,16 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const { NODE_ENV, JWT_SECRET } = require('../utils/constants');
+const { NODE_ENV, JWT_SECRET } = process.env;
 const ErrorUnauthorized = require('../errors/ErrorUnauthorized');
 const ErrorNotFound = require('../errors/ErrorNotFound');
 const ErorrConflict = require('../errors/ErorrConflict');
 const ErorrRequest = require('../errors/ErorrRequest');
 
-function getUsers(_, res, next) {
-  User.find({})
-    .then((users) => res.send({ users }))
+function getUsers(req, res, next) {
+  User.findById(req.user._id)
+    .orFail(() => next(new ErrorNotFound('Пользователь по указанному id не найден')))
+    .then((user) => res.send(user))
     .catch(next);
 }
 

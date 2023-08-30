@@ -4,8 +4,8 @@ const ErrorForbidden = require('../errors/ErrorForbidden');
 const ErrorNotFound = require('../errors/ErrorNotFound');
 const ErorrRequest = require('../errors/ErorrRequest');
 
-function getMovies(_, res, next) {
-  Movie.find({})
+function getMovies(req, res, next) {
+  Movie.find({ owner: req.userId.toString() })
     .then((cards) => res.send({ data: cards }))
     .catch(next);
 }

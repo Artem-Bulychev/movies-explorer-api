@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 
 const { Schema } = mongoose;
 
-const { urlRegex } = require('../utils/constants');
+require('../utils/constants');
 
 const userSchema = new Schema(
   {
