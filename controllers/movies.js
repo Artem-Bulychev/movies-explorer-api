@@ -1,53 +1,31 @@
 const Movie = require('../models/movie');
 
+const movieSchema = require('../models/movie');
+
 const ErrorForbidden = require('../errors/ErrorForbidden');
 const ErrorNotFound = require('../errors/ErrorNotFound');
 const ErorrRequest = require('../errors/ErorrRequest');
 
 function getMovies(req, res, next) {
-  Movie.find({ owner: req.userId.toString() })
-    .then((cards) => res.send({ data: cards }))
+  movieSchema
+    .find({ owner: req.user._id })
+    .then((movies) => res.send(movies))
     .catch(next);
 }
 
 function createMovie(req, res, next) {
-  const {
-    country,
-    director,
-    duration,
-    year,
-    description,
-    image,
-    trailerLink,
-    thumbnail,
-    movieId,
-    nameRU,
-    nameEN,
-  } = req.body;
-  const { userId } = req.user;
+  const owner = req.user._id;
 
-  Movie.create({
-    country,
-    director,
-    duration,
-    year,
-    description,
-    image,
-    trailerLink,
-    thumbnail,
-    movieId,
-    nameRU,
-    nameEN,
-    owner: userId,
-  })
+  movieSchema
+    .create({ ...req.body, owner })
     .then((movie) => res.status(201).send(movie))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
+    .catch((error) => {
+      if (error.name === 'ValidationError') {
         next(
-          new ErorrRequest('Переданы некорректные данные при создании карточки'),
+          new ErorrRequest('Переданы некорректные данные при создании фильма.'),
         );
       } else {
-        next(err);
+        next(error);
       }
     });
 }

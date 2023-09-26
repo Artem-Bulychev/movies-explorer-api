@@ -58,10 +58,9 @@ function createUser(req, res, next) {
 
 function updateUser(req, res, next) {
   const { name, email } = req.body;
-  const { userId } = req.user;
 
   User.findByIdAndUpdate(
-    userId,
+    req.user._id,
     {
       name,
       email,
@@ -77,7 +76,13 @@ function updateUser(req, res, next) {
       throw new ErrorNotFound('Пользователь с таким id не найден');
     })
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
+      if (err.code === 11000) {
+        next(
+          new ErorrConflict(
+            'Пользователь с таким электронным адресом уже зарегистрирован',
+          ),
+        );
+      } else if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(
           new ErorrRequest(
             'Переданы некорректные данные при обновлении профиля',
@@ -93,10 +98,10 @@ function login(req, res, next) {
   const { email, password } = req.body;
 
   User.findUserByCredentials(email, password)
-    .then(({ _id: userId }) => {
-      if (userId) {
+    .then((user) => {
+      if (user) {
         const token = jwt.sign(
-          { userId },
+          { _id: user._id },
           NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
           { expiresIn: '7d' },
         );
